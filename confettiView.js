@@ -11,53 +11,57 @@ import Confetti from "./confetti.js";
 class ConfettiView extends Component {
   constructor(props) {
       super(props);
+
       this.state = {confettis: []};
+
       this.confettiIndex = 0;
-      this.stopConfetti = false;
+      this.stop = false;
   }
 
   startConfetti() {
        let {confettis} = this.state;
        let {confettiCount, timeout} = this.props;
-       this.stopConfetti = false;
        if(this.confettiIndex < confettiCount) {
          setTimeout(() => {
-           if (this.stopConfetti) {
-             return;
-           } else {
-             confettis.push({key: this.confettiIndex});
-             this.confettiIndex++;
-             this.setState({confettis});
+           confettis.push({key: this.confettiIndex});
+           this.confettiIndex++;
+           this.setState({confettis});
+           if (!this.stop) {
              this.startConfetti();
            }
          }, timeout);
        }
   }
 
+  stopConfetti() {
+    this.stop = true;
+  }
+
   removeConfetti(key) {
-       let {confettis} = this.state;
-       let {confettiCount} = this.props;
-       let index = confettis.findIndex(confetti => {return confetti.key === key});
-       confettis.splice(index, 1);
-       this.setState({confettis});
-       if(key === confettiCount - 1) {
-         this.confettiIndex = 0;
-       }
+      if (!this.stop) {
+        let {confettis} = this.state;
+        let {confettiCount} = this.props;
+        let index = confettis.findIndex(confetti => {return confetti.key === key});
+        confettis.splice(index, 1);
+        this.setState({confettis});
+        if(key === confettiCount - 1) {
+          this.confettiIndex = 0;
+        }
+      }
   }
-  
-  stopConfetti () 
-  {
-    this.stopConfetti = true;
-  }
-  
+
   render() {
        let {confettis} = this.state;
        let {...otherProps} = this.props
-       return <View style={styles.container}>
-         {confettis.map(confetti => {
-             return <Confetti key={confetti.key} index={confetti.key} onComplete={this.removeConfetti.bind(this, confetti.key)} colors={this.props.colors} {...otherProps}/>
-         })}
-       </View>
+       if (this.stop) {
+         return <View />;
+       } else {
+        return <View style={styles.container}>
+          {confettis.map(confetti => {
+              return <Confetti key={confetti.key} index={confetti.key} onComplete={this.removeConfetti.bind(this, confetti.key)} {...otherProps}/>
+          })}
+        </View>
+       }
   }
 }
 
