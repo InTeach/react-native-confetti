@@ -25,8 +25,8 @@ class ConfettiView extends Component {
          setTimeout(() => {
            confettis.push({key: this.confettiIndex});
            this.confettiIndex++;
-           this.setState({confettis});
            if (!this.stop) {
+             this.setState({confettis});
              this.startConfetti();
            }
          }, timeout);
